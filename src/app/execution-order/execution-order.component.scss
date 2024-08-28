@@ -1,0 +1,56 @@
+.scrollable-tooltip {
+  max-width: 300px; /* Adjust as needed */
+  max-height: 150px; /* Adjust as needed */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  white-space: pre-wrap; /* Preserve whitespace formatting */
+}
+
+
+.text-container {
+  display: flex;
+  align-items: center;      /* Center text vertically */
+  overflow: hidden;         /* Ensure container doesn’t overflow */
+}
+
+/* Ensure text truncation */
+.text-ellipsis {
+  white-space: nowrap;      /* Prevents text from wrapping */
+  overflow: hidden;         /* Hides overflowing text */
+  text-overflow: ellipsis;  /* Adds ellipsis when text is cut off */
+  flex: 1;                  /* Ensures it fills available space */
+}
+
+.custom-table-bg {
+    background-color: #da3636 !important; /* Replace with your desired color */
+  }
+  
+.p-datatable-head{
+  background-color: blueviolet;
+}
+
+ #pn_id_5-table{
+  background-color: #1f5aba;
+  // thead,th {
+  //   background-color: #1f5aba;
+  //   border: 0.25px solid #d6cccc;
+  //  // #3B82F6
+  //   // border-radius: 5rem;
+  // }
+}
+
+// .ng-star-inserted{
+//   background-color: #ba411f;
+// }
+  // td{
+  //   border: 0.25px solid #999;
+  // }
+
+
+  // :host ::ng-deep {
+  //   #myTable {
+  //     .p-datatable-header {
+  //       background-color: rgb(130, 13, 13);
+  //     }
+  //   }
+  // }
