@@ -175,9 +175,9 @@ console.log(this.router.getCurrentNavigation()?.extras.state?.['Record']);
         console.log(this.selectedMainItems);
   
   
-        if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-          mainItem.executionOrdersubList.forEach(subItem => subItem.selected = !subItem.selected);
-        }
+        // if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
+        //   mainItem.executionOrdersubList.forEach(subItem => subItem.selected = !subItem.selected);
+        // }
       }
       else {
         const index = this.selectedMainItems.indexOf(mainItem);
@@ -188,10 +188,10 @@ console.log(this.router.getCurrentNavigation()?.extras.state?.['Record']);
           console.log(this.selectedMainItems);
         }
         // User deselected the record, so we need to deselect all associated subitems
-        if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-          mainItem.executionOrdersubList.forEach(subItem => subItem.selected = false)
-          console.log(mainItem.executionOrdersubList);
-        }
+        // if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
+        //   mainItem.executionOrdersubList.forEach(subItem => subItem.selected = false)
+        //   console.log(mainItem.executionOrdersubList);
+        // }
       }
     }
     // to handle All Records Selection / Deselection 
@@ -263,9 +263,9 @@ console.log(this.router.getCurrentNavigation()?.extras.state?.['Record']);
         const newRecord: MainItem = {
           ...record, // Copy all properties from the original record
           // Modify specific attributes
-          executionOrdersubList: (record?.executionOrdersubList ?? []).map(subItem =>
-            this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-          ),
+          // executionOrdersubList: (record?.executionOrdersubList ?? []).map(subItem =>
+          //   this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
+          // ),
           unitOfMeasurementCode: this.updateSelectedServiceNumberRecord.baseUnitOfMeasurement,
           description: this.updateSelectedServiceNumberRecord.description,
           materialGroupCode: this.updateSelectedServiceNumberRecord.materialGroupCode,
@@ -731,16 +731,16 @@ console.log(this.router.getCurrentNavigation()?.extras.state?.['Record']);
         const { executionOrderMainCode, total, ...mainItemWithoutMainItemCode } = mainItem;
         const updatedRecord: MainItem = {
           ...mainItemWithoutMainItemCode, // Copy all properties from the original record
-          executionOrdersubList: [
-            ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
-              this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-            ),
-            filteredSubItem
-          ],
+          // executionOrdersubList: [
+          //   ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
+          //     this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
+          //   ),
+          //   filteredSubItem
+          // ],
           executionOrderMainCode: 0,
           total: 0
         }
-        console.log(updatedRecord.executionOrdersubList);
+        //console.log(updatedRecord.executionOrdersubList);
   
         // if (this.newMainItem.quantity === 0 || this.newMainItem.grossPrice === 0) {
         //   this.messageService.add({
@@ -815,16 +815,16 @@ console.log(this.router.getCurrentNavigation()?.extras.state?.['Record']);
         const { executionOrderMainCode, total, ...mainItemWithoutMainItemCode } = mainItem;
         const updatedRecord: MainItem = {
           ...mainItemWithoutMainItemCode, // Copy all properties from the original record
-          executionOrdersubList: [
-            ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
-              this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-            ),
-            filteredSubItem
-          ],
+          // executionOrdersubList: [
+          //   ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
+          //     this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
+          //   ),
+          //   filteredSubItem
+          // ],
           executionOrderMainCode: 0,
           total: 0
         }
-        console.log(updatedRecord.executionOrdersubList);
+       // console.log(updatedRecord.executionOrdersubList);
         console.log(updatedRecord);
         // if ( this.resultAfterTest === 0 || this.newMainItem.grossPrice === 0) {
         //   this.messageService.add({

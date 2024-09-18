@@ -7,15 +7,14 @@
         </div>
 
         <div class="p-toolbar-group-end">
-            <button pButton pRipple icon="pi pi-copy" class="p-button-rounded m-2"></button>
+            <!-- <button pButton pRipple icon="pi pi-copy" class="p-button-rounded m-2"></button> -->
             <button pButton size="small" icon="pi pi-trash" (click)="deleteRecord()" severity="danger"
                 class="m-2"></button>
             <button pButton icon="pi pi-print" size="small" class="m-2 "></button>
             <button pButton label="Export" size="small" (click)="exportExcel()" icon="pi pi-download"
                 class="m-2"></button>
-            <button pButton label="Service-Invoice" size="small" (click)="navigateServiceInvoice()" icon="pi pi-upload"
-                class="m-2"></button>
-
+            <!-- <button pButton label="Service-Invoice" size="small" (click)="navigateServiceInvoice()" icon="pi pi-upload"
+                class="m-2"></button> -->
         </div>
     </p-toolbar>
 
@@ -37,17 +36,32 @@
 <p-toast></p-toast>
 
 <p-table [value]="mainItemsRecords |search:searchKey" dataKey="executionOrderMainCode" [resizableColumns]="true"
-    [expandedRowKeys]="expandedRows" editMode="row">
+     editMode="row" selectionMode="multiple" [(selection)]="selectedExecutionOrder"
+     [rowHover]="true"
+     [rows]="10"
+     [showCurrentPageReport]="true"
+     [rowsPerPageOptions]="[10, 25, 50]"
+     [loading]="loading"
+     [paginator]="true"
+     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+     [filterDelay]="0">
 
     <ng-template pTemplate="caption">
         <div class="flex flex-wrap justify-content-between gap-2">
-            <div>
+            <div class="border border-primary rounded">
+                <div fd-form-item>
+
+                    <fd-input-group type="search" glyph="search" glyphAriaLabel="Search" placeholder="Search..."
+                        [button]="true" [disabled]="false" [(ngModel)]="searchKey">
+                    </fd-input-group>
+                </div>
+            </div>
+            <!-- <div>
                 <span class="p-input-icon-left">
                     <input pInputText type="text" placeholder="Search...." [(ngModel)]="searchKey"
                         class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-primary focus:border-primary w-100 " />
                 </span>
-
-            </div>
+            </div> -->
         </div>
     </ng-template>
 
@@ -59,7 +73,6 @@
             </th>
             <th style="min-width: 10rem;">Print </th>
             <th style="min-width: 10rem;"> MainItem.No </th>
-            <!-- <th style="min-width: 10rem;"> SubItem.No </th> -->
             <th style="min-width: 10rem;">ServiceNO.</th>
             <th style="min-width: 10rem;">Description</th>
             <th style="min-width: 10rem;">Quantity</th>
@@ -87,22 +100,17 @@
         </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-mainItem let-editing="editing" let-ri="rowIndex" let-expanded="expanded">
+    <ng-template pTemplate="body" let-mainItem let-editing="editing" let-ri="rowIndex" >
         <tr [pEditableRow]="mainItem">
 
-            <!-- <td style="min-width: 10rem;">
-                <p-button type="button" pRipple [pRowToggler]="mainItem" [text]="true" [rounded]="true" [plain]="true"
-                    [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
-            </td> -->
             <td style="min-width: 10rem;">
-
-                <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.selected"
-                    (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox>
+                <p-tableCheckbox [value]="mainItem" />
+                <!-- <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.selected"
+                    (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox> -->
 
             </td>
             <td style="min-width: 10rem;">
-
-                <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.doNotPrint"
+                <p-checkbox [value]="mainItem"  [(ngModel)]="mainItem.doNotPrint"
                     (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox>
 
             </td>
@@ -138,12 +146,12 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <ng-container *ngIf="!updateSelectedServiceNumberRecord">
-                            <input pInputText type="text" [(ngModel)]="mainItem.description"
+                            <input pInputText type="text" [(ngModel)]="mainItem.description" class="rounded-input"
                             pTooltip="{{ mainItem.description }}" tooltipPosition="top"  [autoHide]="false">
                         </ng-container>
                         <ng-container *ngIf="updateShortTextChangeAllowed && updateSelectedServiceNumberRecord">
                             <input pInputText type="text" [ngModel]="updateSelectedServiceNumberRecord.description"
-                                (ngModelChange)="updateShortText = $event"
+                            class="rounded-input" (ngModelChange)="updateShortText = $event"
                                 pTooltip="{{ mainItem.description }}" tooltipPosition="top"  [autoHide]="false">
                         </ng-container>
                         <ng-container *ngIf="!updateShortTextChangeAllowed && updateSelectedServiceNumberRecord">
@@ -170,12 +178,8 @@
 
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <!-- <ng-container *ngIf="!updatedFormulaRecord"> -->
-                        <input pInputNumber [min]="0" type="number" [(ngModel)]="mainItem.totalQuantity">
-                        <!-- </ng-container>
-                        <ng-container *ngIf="updatedFormulaRecord && resultAfterTestUpdate">
-                            {{ resultAfterTestUpdate}}
-                        </ng-container>-->
+                        <input pInputNumber [min]="0" class="rounded-input" type="number" [(ngModel)]="mainItem.totalQuantity">
+                        
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.totalQuantity }}
@@ -211,7 +215,7 @@
             <td style="min-width: 10rem;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber name="amountPerUnit" type="number" [min]="0"
+                        <input pInputNumber class="rounded-input" name="amountPerUnit" type="number" [min]="0"
                             [(ngModel)]="mainItem.amountPerUnit">
 
                     </ng-template>
@@ -281,7 +285,7 @@
                 <!-- OverFulfillment -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber name="overFulfillmentPercentage" type="number" [min]="0"
+                        <input pInputNumber class="rounded-input" name="overFulfillmentPercentage" type="number" [min]="0"
                             [(ngModel)]="mainItem.overFulfillmentPercentage">
 
                     </ng-template>
@@ -294,7 +298,7 @@
                 <!-- Unlimited OverFulfillment -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber name="unlimitedOverFulfillment" type="checkbox"
+                        <input pInputNumber class="rounded-input" name="unlimitedOverFulfillment" type="checkbox"
                             [(ngModel)]="mainItem.unlimitedOverFulfillment">
 
                     </ng-template>
@@ -307,7 +311,7 @@
                 <!-- Manual Price Entry Allowed -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="manualPriceEntryAllowed" type="checkbox"
+                        <input pInputText class="rounded-input" name="manualPriceEntryAllowed" type="checkbox"
                             [(ngModel)]="mainItem.manualPriceEntryAllowed">
 
                     </ng-template>
@@ -382,7 +386,7 @@
                 <!-- External Service Number -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="externalServiceNumber" type="text"
+                        <input pInputText class="rounded-input" name="externalServiceNumber" type="text"
                             [(ngModel)]="mainItem.externalServiceNumber"
                             pTooltip="{{ mainItem.externalServiceNumber }}" tooltipPosition="top"  [autoHide]="false">
 
@@ -404,7 +408,7 @@
                 <!-- Service Text -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="serviceText" type="text" [(ngModel)]="mainItem.serviceText"
+                        <input pInputText class="rounded-input" name="serviceText" type="text" [(ngModel)]="mainItem.serviceText"
                         pTooltip="{{ mainItem.serviceText }}" tooltipPosition="top"  [autoHide]="false">
 
                     </ng-template>
@@ -424,7 +428,7 @@
                 <!--  Line Text -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="lineText" type="text" [(ngModel)]="mainItem.lineText"
+                        <input pInputText class="rounded-input" name="lineText" type="text" [(ngModel)]="mainItem.lineText"
                         pTooltip="{{ mainItem.lineText }}" tooltipPosition="top"  [autoHide]="false">
 
                     </ng-template>
@@ -445,7 +449,7 @@
                 <!-- Personnel Number -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="personnelNumberCode" type="text"
+                        <input pInputText class="rounded-input" name="personnelNumberCode" type="text"
                             [(ngModel)]="mainItem.personnelNumberCode"
                             pTooltip="{{ mainItem.personnelNumberCode }}" tooltipPosition="top"  [autoHide]="false">
 
@@ -489,7 +493,7 @@
                 <!-- Line Number -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber name="lineNumber" type="text" [(ngModel)]="mainItem.lineNumber">
+                        <input pInputNumber class="rounded-input" name="lineNumber" type="text" [(ngModel)]="mainItem.lineNumber">
 
                     </ng-template>
                     <ng-template pTemplate="output">
@@ -502,7 +506,7 @@
                 <!-- Bidders Line -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="biddersLine" [(ngModel)]="mainItem.biddersLine" type="checkbox">
+                        <input  name="biddersLine" class="rounded-input" [(ngModel)]="mainItem.biddersLine" type="checkbox">
 
                     </ng-template>
                     <ng-template pTemplate="output">
@@ -514,7 +518,7 @@
                 <!--  Supplementary Line  -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="supplementaryLine" [(ngModel)]="mainItem.supplementaryLine"
+                        <input  name="supplementaryLine"  class="rounded-input" [(ngModel)]="mainItem.supplementaryLine"
                             type="checkbox">
 
                     </ng-template>
@@ -527,7 +531,7 @@
                 <!-- Lot Cost One -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText name="lotCostOne" [(ngModel)]="mainItem.lotCostOne" type="checkbox">
+                        <input  name="lotCostOne" class="rounded-input" [(ngModel)]="mainItem.lotCostOne" type="checkbox">
 
                     </ng-template>
                     <ng-template pTemplate="output">
@@ -542,7 +546,7 @@
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
                         (click)="onMainItemEditInit(mainItem)" class="p-button-rounded p-button-text"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
-                        (click)="onMainItemEditSave(mainItem.id,mainItem)"
+                        (click)="onMainItemEditSave(mainItem.executionOrderMainCode,mainItem)"
                         class="p-button-rounded p-button-text p-button-success mr-2"></button>
                     <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
                         (click)="onMainItemEditCancel(mainItem, ri)"
@@ -584,10 +588,10 @@
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="!selectedServiceNumberRecord">
                     <input pInputText name="description" type="text" [(ngModel)]="newMainItem.description"
-                    pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false">
+                    pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false" class="rounded-input">
                 </ng-container>
                 <ng-container *ngIf="shortTextChangeAllowed && selectedServiceNumberRecord">
-                    <input pInputText type="text" [(ngModel)]="selectedServiceNumberRecord.description"
+                    <input pInputText type="text" [(ngModel)]="selectedServiceNumberRecord.description" class="rounded-input"
                         (ngModelChange)="shortText = $event" pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false">
                 </ng-container>
                 <ng-container *ngIf="!shortTextChangeAllowed && selectedServiceNumberRecord">
@@ -601,7 +605,7 @@
 
             <td style="min-width: 10rem;">
                 <input pInputNumber name="totalQuantity" type="number" [min]="0"
-                    [(ngModel)]="newMainItem.totalQuantity">
+                    [(ngModel)]="newMainItem.totalQuantity" class="rounded-input">
             </td>
 
             <td style="min-width: 10rem;">
@@ -626,7 +630,7 @@
             </td>
             <td style="min-width: 10rem;">
                 <input pInputNumber name="amountPerUnit" type="number" [min]="0"
-                    [(ngModel)]="newMainItem.amountPerUnit">
+                    [(ngModel)]="newMainItem.amountPerUnit" class="rounded-input">
             </td>
             <td style="min-width: 10rem;">
                 <p-dropdown [options]="recordsCurrency" [(ngModel)]="selectedCurrency"
@@ -659,17 +663,17 @@
             <!-- OverFulfillment -->
             <td style="min-width: 10rem;">
                 <input pInputNumber name="overFulfillmentPercentage" type="number" [min]="0"
-                    [(ngModel)]="newMainItem.overFulfillmentPercentage">
+                    [(ngModel)]="newMainItem.overFulfillmentPercentage" class="rounded-input">
             </td>
             <!-- Unlimited OverFulfillment -->
             <td style="min-width: 10rem;">
                 <input pInputNumber name="unlimitedOverFulfillment" type="checkbox"
-                    [(ngModel)]="newMainItem.unlimitedOverFulfillment">
+                    [(ngModel)]="newMainItem.unlimitedOverFulfillment" class="rounded-input">
             </td>
             <!-- Manual Price Entry Allowed -->
             <td style="min-width: 10rem;">
                 <input pInputText name="manualPriceEntryAllowed" type="checkbox"
-                    [(ngModel)]="newMainItem.manualPriceEntryAllowed">
+                    [(ngModel)]="newMainItem.manualPriceEntryAllowed" class="rounded-input">
             </td>
             <!-- Material Grp -->
             <td style="min-width: 10rem;">
@@ -715,23 +719,23 @@
             <!-- External Service Number -->
             <td style="min-width: 10rem;">
                 <input pInputNumber name="externalServiceNumber" type="text"
-                    [(ngModel)]="newMainItem.externalServiceNumber"
+                    [(ngModel)]="newMainItem.externalServiceNumber" class="rounded-input"
                     pTooltip="{{ newMainItem.externalServiceNumber }}" tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Service Text -->
             <td style="min-width: 10rem;">
-                <input pInputNumber name="serviceText" type="text" [(ngModel)]="newMainItem.serviceText"
+                <input pInputNumber name="serviceText" class="rounded-input" type="text" [(ngModel)]="newMainItem.serviceText"
                 pTooltip="{{ newMainItem.serviceText }}" tooltipPosition="top" [autoHide]="false">
 
             </td>
             <!--  Line Text -->
             <td style="min-width: 10rem;">
-                <input pInputText name="lineText" type="text" [(ngModel)]="newMainItem.lineText"
+                <input pInputText name="lineText" class="rounded-input" type="text" [(ngModel)]="newMainItem.lineText"
                 pTooltip="{{ newMainItem.lineText }}" tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Personnel Number -->
             <td style="min-width: 10rem;">
-                <input pInputText name="personnelNumberCode" type="text" [(ngModel)]="newMainItem.personnelNumberCode"
+                <input pInputText name="personnelNumberCode" class="rounded-input" type="text" [(ngModel)]="newMainItem.personnelNumberCode"
                 pTooltip="{{ newMainItem.personnelNumberCode }}" tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Line Type -->
@@ -750,22 +754,22 @@
             </td>
             <!-- Line Number -->
             <td style="min-width: 10rem;">
-                <input pInputNumber name="lineNumber" type="text" [(ngModel)]="newMainItem.lineNumber"
+                <input pInputNumber name="lineNumber" class="rounded-input" type="text" [(ngModel)]="newMainItem.lineNumber"
                 pTooltip="{{ newMainItem.lineNumber }}" tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Bidders Line -->
             <td style="min-width: 10rem;">
-                <input pInputText name="biddersLine" type="checkbox" [(ngModel)]="newMainItem.biddersLine">
+                <input pInputText name="biddersLine" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.biddersLine">
             </td>
 
             <!--  Supplementary Line  -->
             <td style="min-width: 10rem;">
-                <input pInputText name="supplementaryLine" type="checkbox" [(ngModel)]="newMainItem.supplementaryLine">
+                <input pInputText name="supplementaryLine" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.supplementaryLine">
             </td>
 
             <!-- Lot Cost One -->
             <td style="min-width: 10rem;">
-                <input pInputText name="lotCostOne" type="checkbox" [(ngModel)]="newMainItem.lotCostOne">
+                <input pInputText name="lotCostOne" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.lotCostOne">
             </td>
 
             <td style="min-width: 10rem;">

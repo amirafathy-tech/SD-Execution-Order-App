@@ -1,3 +1,19 @@
+.rounded-input {
+  border-radius: 8px; 
+  border: 1px solid #ccc; 
+  padding: 8px 12px;
+  font-size: 1rem; 
+  outline: none; 
+  transition: border-color 0.3s, box-shadow 0.3s; 
+}
+
+.rounded-input:focus {
+  border-color: #007bff; 
+  box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.25); 
+}
+
+
+
 .scrollable-tooltip {
   max-width: 300px; /* Adjust as needed */
   max-height: 150px; /* Adjust as needed */

@@ -8,11 +8,10 @@ import { ApiService } from '../shared/ApiService.service';
 import * as FileSaver from 'file-saver';
 
 
-import { MainItem, SubItem } from './execution-order.model';
+import { MainItem } from './execution-order.model';
 import { MaterialGroup } from '../models/materialGroup.model';
 import { ServiceType } from '../models/serviceType.model';
 import { LineType } from '../models/lineType.model';
-import { main } from '@popperjs/core';
 import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
@@ -24,9 +23,15 @@ import { NavigationExtras, Router } from '@angular/router';
   providers: [MessageService, ExecutionOrderService, ConfirmationService]
 })
 export class ExecutionOrderComponent {
+
+  // Pagination:
+  loading: boolean = true;
+  ///
   searchKey: string = ""
   currency: any
   totalValue: number = 0.0
+
+  selectedExecutionOrder:MainItem[]=[]
   //fields for dropdown lists
   recordsServiceNumber!: ServiceMaster[];
   selectedServiceNumberRecord?: ServiceMaster
@@ -52,22 +57,14 @@ export class ExecutionOrderComponent {
   selectedLineType: string = "Standard line";
 
   recordsCurrency!: any[];
-  selectedCurrency!: string;
+  selectedCurrency: string="";
   //
   public rowIndex = 0;
-  expandedRows: { [key: number]: boolean } = {};
 
   mainItemsRecords: MainItem[] = [];
-  subItemsRecords: SubItem[] = [];
 
   constructor(private router: Router, private _ApiService: ApiService, private _ExecutionOrderService: ExecutionOrderService, private messageService: MessageService, private confirmationService: ConfirmationService) { }
 
-
-  resizeTextarea(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-  }
   
   ngOnInit() {
     this._ApiService.get<ServiceMaster[]>('servicenumbers').subscribe(response => {
@@ -89,6 +86,7 @@ export class ExecutionOrderComponent {
     this._ApiService.get<MainItem[]>('executionordermain').subscribe(response => {
       this.mainItemsRecords = response.sort((a, b) => a.executionOrderMainCode - b.executionOrderMainCode);
       console.log(this.mainItemsRecords);
+      this.loading = false;
 
       const filteredRecords = this.mainItemsRecords.filter(record => record.lineTypeCode != "Contingency line");
 
@@ -129,47 +127,6 @@ export class ExecutionOrderComponent {
   // to handel checkbox selection:
   selectedMainItem: MainItem | undefined;
   selectedMainItems: MainItem[] = [];
-  selectedSubItems: SubItem[] = [];
-
-  // onMainItemSelection(event: any, mainItem: MainItem) {
-  //   mainItem.selected = event.checked;
-  //   console.log(event.checked);
-
-  //   console.log(this.selectedMainItems);
-
-  //   if (mainItem.selected) {
-
-  //     this.selectedMainItem = mainItem;
-
-  //     console.log(this.selectedMainItem);
-
-  //     this.selectedMainItems.push(mainItem);
-  //     console.log(this.selectedMainItems);
-
-
-  //     if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-  //       mainItem.executionOrdersubList.forEach(subItem => subItem.selected = !subItem.selected);
-  //     }
-  //   }
-  //   else {
-  //     this.selectedMainItem = undefined
-  //     console.log("selected MainItem", this.selectedMainItem);
-
-
-  //     const index = this.selectedMainItems.indexOf(mainItem);
-  //     console.log(index);
-
-  //     if (index !== -1) {
-  //       this.selectedMainItems.splice(index, 1);
-  //       console.log(this.selectedMainItems);
-  //     }
-  //     // User deselected the record, so we need to deselect all associated subitems
-  //     if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-  //       mainItem.executionOrdersubList.forEach(subItem => subItem.selected = false)
-  //       console.log(mainItem.executionOrdersubList);
-  //     }
-  //   }
-  // }
 
   onMainItemSelection(event: any, mainItem: MainItem) {
     console.log('Event:', event);
@@ -191,10 +148,6 @@ export class ExecutionOrderComponent {
         console.log('Selected Main Items after addition:', this.selectedMainItems);
       }
 
-      if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-        mainItem.executionOrdersubList.forEach(subItem => subItem.selected = !subItem.selected);
-        console.log('SubItems after selection:', mainItem.executionOrdersubList);
-      }
     } else {
       console.log('Entering else block');
       this.selectedMainItem = undefined;
@@ -206,11 +159,6 @@ export class ExecutionOrderComponent {
       if (index !== -1) {
         this.selectedMainItems.splice(index, 1);
         console.log('Selected Main Items after removal:', this.selectedMainItems);
-      }
-
-      if (mainItem.executionOrdersubList && mainItem.executionOrdersubList.length > 0) {
-        mainItem.executionOrdersubList.forEach(subItem => subItem.selected = false);
-        console.log('SubItems after deselection:', mainItem.executionOrdersubList);
       }
     }
   }
@@ -226,10 +174,6 @@ export class ExecutionOrderComponent {
     }
   }
 
-  onSubItemSelection(event: any, subItem: SubItem) {
-    console.log(subItem);
-    this.selectedSubItems.push(subItem);
-  }
   //In Creation to handle shortTextChangeAlowlled Flag 
   onServiceNumberChange(event: any) {
     const selectedRecord = this.recordsServiceNumber.find(record => record.serviceNumberCode === this.selectedServiceNumber);
@@ -257,69 +201,85 @@ export class ExecutionOrderComponent {
     }
   }
 
-  // expandAll() {
-  //   this.mainItemsRecords.forEach(item => this.expandedRows[item.executionOrderMainCode] = true);
-  // }
-  // collapseAll() {
-  //   this.expandedRows = {};
-  // }
-
   // For Edit  MainItem
   clonedMainItem: { [s: number]: MainItem } = {};
   onMainItemEditInit(record: MainItem) {
+    console.log(record);
+    
     this.clonedMainItem[record.executionOrderMainCode] = { ...record };
   }
   onMainItemEditSave(index: number, record: MainItem) {
     console.log(record);
-
-    const { executionOrderMainCode, total, ...mainItemWithoutMainItemCode } = record;
-    const updatedMainItem = this.removePropertiesFrom(mainItemWithoutMainItemCode, ['executionOrderMainCode', 'executionOrderSubCode']);
+   // const { executionOrderMainCode,total, ...mainItemWithoutMainItemCode } = record;
+   // const updatedMainItem = this.removePropertiesFrom(mainItemWithoutMainItemCode, ['executionOrderMainCode']);
+    const updatedMainItem = this.removePropertiesFrom(record, ['executionOrderMainCode','total']);
     console.log(updatedMainItem);
-
     console.log(this.updateSelectedServiceNumber);
+
     if (this.updateSelectedServiceNumberRecord) {
-      // (record?.subItems ?? []).map(subItem =>
-      //   this.removeProperties(subItem, ['mainItemCode', 'subItemCode'])
-      // )
+     
       const newRecord: MainItem = {
-        ...record, // Copy all properties from the original record
-        // Modify specific attributes
-        executionOrdersubList: (record?.executionOrdersubList ?? []).map(subItem =>
-          this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-        ),
+      // ...record, // Copy all properties from the original record
+      ...updatedMainItem,
         unitOfMeasurementCode: this.updateSelectedServiceNumberRecord.baseUnitOfMeasurement,
         description: this.updateSelectedServiceNumberRecord.description,
         materialGroupCode: this.updateSelectedServiceNumberRecord.materialGroupCode,
         serviceTypeCode: this.updateSelectedServiceNumberRecord.serviceTypeCode,
       };
       console.log(newRecord);
-      this._ApiService.patch<MainItem>('executionordermain', record.executionOrderMainCode, newRecord).subscribe(response => {
-        console.log('executionordermain updated:', response);
-        if (response) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record is updated' });
-        }
-        else {
+     // const { executionOrderMainCode,total, ...updatedNewRecord } = newRecord;
+      // const updatedNewRecord = this.removePropertiesFrom(newRecord, ['executionOrderMainCode']);
+      console.log(newRecord);
+         // Remove properties with empty or default values
+         const filteredRecord = Object.fromEntries(
+          Object.entries(newRecord).filter(([_, value]) => {
+            return value !== '' && value !== 0 && value !== undefined && value !== null;
+          })
+        );
+        console.log(filteredRecord);
+      
+      this._ApiService.patch<MainItem>('executionordermain', record.executionOrderMainCode, filteredRecord).subscribe({
+        next: (res) => {
+          console.log('executionordermain  updated:', res);
+          this.totalValue = 0;
+          this.ngOnInit()
+        }, error: (err) => {
+          console.log(err);
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
+        },
+        complete: () => {
+          this.updateSelectedServiceNumberRecord=undefined;
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
+          // this.ngOnInit()
         }
-        // console.log(this.totalValue)
-        this.totalValue = 0;
-        this.ngOnInit()
+       
       });
     }
 
     if (!this.updateSelectedServiceNumberRecord) {
-      console.log({ ...mainItemWithoutMainItemCode });
-      this._ApiService.patch<MainItem>('executionordermain', record.executionOrderMainCode, { ...updatedMainItem }).subscribe(response => {
-        console.log('executionordermain updated:', response);
-        if (response) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record is updated' });
-        }
-        else {
+      //console.log({ ...mainItemWithoutMainItemCode });
+      console.log(updatedMainItem);
+      
+       // Remove properties with empty or default values
+       const filteredRecord = Object.fromEntries(
+        Object.entries(updatedMainItem).filter(([_, value]) => {
+          return value !== '' && value !== 0 && value !== undefined && value !== null;
+        })
+      );
+      console.log(filteredRecord);
+      this._ApiService.patch<MainItem>('executionordermain', record.executionOrderMainCode, filteredRecord).subscribe({
+        next: (res) => {
+          console.log('executionordermain  updated:', res);
+          this.totalValue = 0;
+          this.ngOnInit()
+        }, error: (err) => {
+          console.log(err);
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
+        },
+        complete: () => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
+          // this.ngOnInit()
         }
-        this.totalValue = 0;
-        //this.modelSpecDetailsService.getRecords();
-        this.ngOnInit()
       });
     }
   }
@@ -328,92 +288,18 @@ export class ExecutionOrderComponent {
     delete this.clonedMainItem[row.executionOrderMainCode]
   }
 
-  // For Edit  SubItem
-  clonedSubItem: { [s: number]: SubItem } = {};
-  onSubItemEditInit(record: SubItem) {
-    if (record.executionOrderSubCode) {
-      this.clonedSubItem[record.executionOrderSubCode] = { ...record };
-    }
-  }
-  onSubItemEditSave(index: number, record: SubItem) {
-    console.log(record);
-    console.log(index);
-
-
-    const { executionOrderSubCode, ...subItemWithoutSubItemCode } = record;
-
-    console.log(this.updateSelectedServiceNumber);
-    if (this.updateSelectedServiceNumberRecord) {
-      const newRecord: SubItem = {
-        ...record, // Copy all properties from the original record
-        // Modify specific attributes
-        unitOfMeasurementCode: this.updateSelectedServiceNumberRecord.baseUnitOfMeasurement,
-        description: this.updateSelectedServiceNumberRecord.description,
-        materialGroupCode: this.updateSelectedServiceNumberRecord.materialGroupCode,
-        serviceTypeCode: this.updateSelectedServiceNumberRecord.serviceTypeCode,
-      };
-      console.log(newRecord);
-      this._ApiService.patch<SubItem>('executionordersub', index, newRecord).subscribe(response => {
-        console.log('executionordersub updated:', response);
-        if (response) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record is updated' });
-        }
-        else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
-        }
-        // console.log(this.totalValue)
-        // this.totalValue = 0;
-        this.ngOnInit()
-      });
-    }
-
-
-    if (!this.updateSelectedServiceNumberRecord) {
-      this._ApiService.patch<SubItem>('executionordersub', index, { ...subItemWithoutSubItemCode }).subscribe(response => {
-        console.log('executionordersub updated:', response);
-        if (response) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record is updated' });
-        }
-        else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
-        }
-        //this.totalValue = 0;
-        //this.modelSpecDetailsService.getRecords();
-        this.ngOnInit()
-      });
-    }
-  }
-  onSubItemEditCancel(subItem: any, index: number) {
-    // Check if subItem exists in clonedSubItems
-    const originalItem = this.clonedSubItem[subItem.executionOrderSubCode];
-
-    if (originalItem) {
-      // Revert the item in the table to its original state
-      this.mainItemsRecords.forEach(mainItem => {
-        if (mainItem.executionOrdersubList && mainItem.executionOrdersubList[index] === subItem) {
-          mainItem.executionOrdersubList[index] = { ...originalItem }; // Restore original item
-        }
-      });
-      // Remove the item from clonedSubItems
-      delete this.clonedSubItem[subItem.executionOrderSubCode];
-    }
-
-  }
-  // onSubItemEditCancel(row: SubItem, index: number) {
-  //   this.subItemsRecords[index] = this.clonedSubItem[row.executionOrderSubCode ? row.executionOrderSubCode : 0]
-  //   delete this.clonedSubItem[row.executionOrderSubCode ? row.executionOrderSubCode : 0]
-  // }
-
-  // Delete MainItem || SubItem
+  // Delete MainItem 
   deleteRecord() {
     console.log("delete");
-    if (this.selectedMainItems.length) {
+    console.log(this.selectedExecutionOrder);
+    
+    if (this.selectedExecutionOrder.length) {
       this.confirmationService.confirm({
         message: 'Are you sure you want to delete the selected record?',
         header: 'Confirm',
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
-          for (const record of this.selectedMainItems) {
+          for (const record of this.selectedExecutionOrder) {
             console.log(record);
             this._ApiService.delete<MainItem>('executionordermain', record.executionOrderMainCode).subscribe(response => {
               console.log('executionordermain deleted :', response);
@@ -426,30 +312,7 @@ export class ExecutionOrderComponent {
         }
       });
     }
-    if (this.selectedSubItems.length) {
-      this.confirmationService.confirm({
-        message: 'Are you sure you want to delete the selected record?',
-        header: 'Confirm',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-          for (const record of this.selectedSubItems) {
-            console.log(record);
-            if (record.executionOrderSubCode) {
-              this._ApiService.delete<SubItem>('executionordersub', record.executionOrderSubCode).subscribe(response => {
-                console.log('executionordersub deleted :', response);
-                //this.totalValue = 0;
-                this.ngOnInit();
-              });
-            }
-
-          }
-          this.messageService.add({ severity: 'success', summary: 'Successfully', detail: 'Deleted', life: 3000 });
-          this.selectedSubItems = []; // Clear the selectedRecords array after deleting all records
-        }
-      });
-    }
   }
-
 
   // redirect to service-invoice:
   navigateServiceInvoice() {
@@ -466,7 +329,6 @@ export class ExecutionOrderComponent {
     }
 
   }
-
 
   // For Add new  Main Item
   newMainItem: MainItem = {
@@ -556,6 +418,7 @@ export class ExecutionOrderComponent {
         this._ApiService.post<MainItem>('executionordermain', filteredRecord).subscribe({
           next: (res) => {
             console.log('executionordermain created:', res);
+            this.totalValue = 0;
             this.ngOnInit()
           }, error: (err) => {
             console.log(err);
@@ -637,6 +500,7 @@ export class ExecutionOrderComponent {
         this._ApiService.post<MainItem>('executionordermain', filteredRecord).subscribe({
           next: (res) => {
             console.log('executionordermain created:', res);
+            this.totalValue = 0;
             this.ngOnInit()
           }, error: (err) => {
             console.log(err);
@@ -699,250 +563,10 @@ export class ExecutionOrderComponent {
       supplementaryLine: false,
       lotCostOne: false,
       doNotPrint: false,
-
-      // subItems?:SubItem[]
     },
       this.selectedUnitOfMeasure = '';
     // this.selectedServiceNumber=0
   }
-
-
-
-  // // For Add new  Sub Item
-  // newSubItem: SubItem = {
-  //   Type: '',
-
-  //   executionOrderSubCode: 0,
-  //   serviceNumberCode: 0,
-  //   description: "",
-  //   unitOfMeasurementCode: "",
-  //   currencyCode: "",
-  //   materialGroupCode: "",
-  //   serviceTypeCode: "",
-  //   personnelNumberCode: "",
-  //   lineTypeCode: "",
-
-  //   totalQuantity: 0,
-  //   amountPerUnit: 0,
-  //   total: 0,
-
-  //   externalServiceNumber: "",
-  //   serviceText: "",
-  //   lineText: "",
-  //   lineNumber: "",
-
-  //   biddersLine: false,
-  //   supplementaryLine: false,
-  //   lotCostOne: false,
-  //   doNotPrint: false,
-
-  // };
-
-  // addSubItem(mainItem: MainItem) {
-  //   console.log(mainItem);
-  //   if (!this.selectedServiceNumberRecord) { // if user didn't select serviceNumber
-
-  //     const newRecord = {
-  //       unitOfMeasurementCode: this.selectedUnitOfMeasure,
-  //       currencyCode: this.selectedCurrency,
-  //       description: this.newSubItem.description,
-
-  //       materialGroupCode: this.selectedMaterialGroup,
-  //       serviceTypeCode: this.selectedServiceType,
-  //       personnelNumberCode: this.newSubItem.personnelNumberCode,
-  //       lineTypeCode: this.selectedLineType,
-
-  //       totalQuantity: this.newSubItem.totalQuantity,
-  //       amountPerUnit: this.newSubItem.amountPerUnit,
-  //       // total: this.newSubItem.total,
-
-  //       externalServiceNumber: this.newSubItem.externalServiceNumber,
-  //       serviceText: this.newSubItem.serviceText,
-  //       lineText: this.newSubItem.lineText,
-  //       lineNumber: this.newSubItem.lineNumber,
-
-  //       biddersLine: this.newSubItem.biddersLine,
-  //       supplementaryLine: this.newSubItem.supplementaryLine,
-  //       lotCostOne: this.newSubItem.lotCostOne,
-  //       doNotPrint: this.newSubItem.doNotPrint,
-  //     }
-  //     console.log(newRecord);
-
-  //     const filteredSubItem = Object.fromEntries(
-  //       Object.entries(newRecord).filter(([_, value]) => {
-  //         return value !== '' && value !== 0 && value !== undefined && value !== null;
-  //       })
-  //     );
-  //     console.log(filteredSubItem);
-
-  //     const { executionOrderMainCode, total, ...mainItemWithoutMainItemCode } = mainItem;
-  //     const updatedRecord: MainItem = {
-  //       ...mainItemWithoutMainItemCode, // Copy all properties from the original record
-  //       executionOrdersubList: [
-  //         ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
-  //           this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-  //         ),
-  //         filteredSubItem
-  //       ],
-  //       executionOrderMainCode: 0,
-  //       total: 0
-  //     }
-  //     console.log(updatedRecord.executionOrdersubList);
-
-  //     if (this.newSubItem.totalQuantity === 0 || this.newSubItem.amountPerUnit === 0 || this.newSubItem.description == "" || this.selectedCurrency === "") {
-  //       this.messageService.add({
-  //         severity: 'error',
-  //         summary: 'Error',
-  //         detail: 'Quantity & AmountPerUnit & Description and Currency are required',
-  //         life: 5000
-  //       });
-  //     }
-
-  //     else {
-  //       console.log(updatedRecord);
-  //       // Remove properties with empty or default values
-  //       const filteredRecord = Object.fromEntries(
-  //         Object.entries(updatedRecord).filter(([_, value]) => {
-  //           return value !== '' && value !== 0 && value !== undefined && value !== null;
-  //         })
-  //       );
-  //       console.log(filteredRecord);
-
-  //       this._ApiService.patch<MainItem>('executionordermain', mainItem.executionOrderMainCode, filteredRecord).subscribe({
-  //         next: (res) => {
-  //           console.log('executionordermain Updated && subItem Created:', res);
-  //           this.ngOnInit()
-  //         }, error: (err) => {
-  //           console.log(err);
-  //         },
-  //         complete: () => {
-  //           this.resetNewSubItem();
-  //           this.selectedUnitOfMeasure = "";
-  //           this.selectedCurrency = "";
-  //           this.selectedMaterialGroup = "";
-  //           this.selectedServiceType = "";
-  //           this.selectedLineType = "";
-  //           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record added successfully ' });
-  //           // this.ngOnInit()
-  //         }
-  //       });
-  //     }
-  //   }
-
-  //   else if (this.selectedServiceNumberRecord) { // if user select serviceNumber 
-  //     const newRecord = {
-  //       serviceNumberCode: this.selectedServiceNumber,
-  //       unitOfMeasurementCode: this.selectedServiceNumberRecord?.baseUnitOfMeasurement,
-  //       currencyCode: this.selectedCurrency,
-  //       description: this.selectedServiceNumberRecord?.description,
-
-  //       materialGroupCode: this.selectedServiceNumberRecord?.materialGroupCode,
-  //       serviceTypeCode: this.selectedServiceNumberRecord?.serviceTypeCode,
-  //       personnelNumberCode: this.newSubItem.personnelNumberCode,
-  //       lineTypeCode: this.selectedLineType,
-
-  //       totalQuantity: this.newSubItem.totalQuantity,
-  //       amountPerUnit: this.newSubItem.amountPerUnit,
-  //       //total: this.newSubItem.total,
-
-  //       externalServiceNumber: this.newSubItem.externalServiceNumber,
-  //       serviceText: this.newSubItem.serviceText,
-  //       lineText: this.newSubItem.lineText,
-  //       lineNumber: this.newSubItem.lineNumber,
-
-  //       biddersLine: this.newSubItem.biddersLine,
-  //       supplementaryLine: this.newSubItem.supplementaryLine,
-  //       lotCostOne: this.newSubItem.lotCostOne,
-  //       doNotPrint: this.newSubItem.doNotPrint,
-  //     }
-  //     console.log(newRecord);
-  //     const filteredSubItem = Object.fromEntries(
-  //       Object.entries(newRecord).filter(([_, value]) => {
-  //         return value !== '' && value !== 0 && value !== undefined && value !== null;
-  //       })
-  //     );
-  //     console.log(filteredSubItem);
-  //     const { executionOrderMainCode, total, ...mainItemWithoutMainItemCode } = mainItem;
-  //     const updatedRecord: MainItem = {
-  //       ...mainItemWithoutMainItemCode, // Copy all properties from the original record
-  //       executionOrdersubList: [
-  //         ...(mainItem?.executionOrdersubList ?? []).map(subItem =>
-  //           this.removeProperties(subItem, ['executionOrderMainCode', 'executionOrderSubCode'])
-  //         ),
-  //         filteredSubItem
-  //       ],
-  //       executionOrderMainCode: 0,
-  //       total: 0
-  //     }
-  //     console.log(updatedRecord.executionOrdersubList);
-  //     console.log(updatedRecord);
-  //     if (this.newSubItem.totalQuantity === 0 || this.newSubItem.amountPerUnit === 0 || this.selectedCurrency === "") {
-  //       this.messageService.add({
-  //         severity: 'error',
-  //         summary: 'Error',
-  //         detail: 'Quantity & AmountPerUnit and Currency are required',
-  //         life: 5000
-  //       });
-  //     }
-  //     else {
-  //       // Remove properties with empty or default values
-  //       const filteredRecord = Object.fromEntries(
-  //         Object.entries(updatedRecord).filter(([_, value]) => {
-  //           return value !== '' && value !== 0 && value !== undefined && value !== null;
-  //         })
-  //       );
-  //       console.log(filteredRecord);
-
-  //       this._ApiService.patch<MainItem>('executionordermain', mainItem.executionOrderMainCode, filteredRecord).subscribe({
-  //         next: (res) => {
-  //           console.log('executionordermain Updated && subItem Created:', res);
-  //           this.ngOnInit()
-  //         }, error: (err) => {
-  //           console.log(err);
-  //         },
-  //         complete: () => {
-  //           this.resetNewSubItem();
-  //           this.selectedServiceNumberRecord = undefined;
-  //           // this.selectedServiceNumber = 0;
-  //           this.selectedLineType = "";
-  //           this.selectedCurrency = ""
-  //           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record added successfully ' });
-  //           //this.ngOnInit()
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-
-  // resetNewSubItem() {
-  //   this.newSubItem = {
-  //     Type: '',
-  //     executionOrderSubCode: 0,
-  //     serviceNumberCode: 0,
-  //     description: "",
-  //     unitOfMeasurementCode: "",
-  //     currencyCode: "",
-  //     materialGroupCode: "",
-  //     serviceTypeCode: "",
-  //     personnelNumberCode: "",
-  //     lineTypeCode: "",
-
-  //     totalQuantity: 0,
-  //     amountPerUnit: 0,
-  //     total: 0,
-
-  //     externalServiceNumber: "",
-  //     serviceText: "",
-  //     lineText: "",
-  //     lineNumber: "",
-
-  //     biddersLine: false,
-  //     supplementaryLine: false,
-  //     lotCostOne: false,
-  //     doNotPrint: false,
-  //   },
-  //     this.selectedUnitOfMeasure = '';
-  // }
   
   // Export to excel sheet:
   transformData(data: MainItem[]) {
@@ -979,40 +603,6 @@ export class ExecutionOrderComponent {
         executionOrderMainCode: mainItem.executionOrderMainCode
       });
 
-      // Add subitems
-      mainItem.executionOrdersubList?.forEach(subItem => {
-        transformed.push({
-          Type: 'Sub Item',
-          serviceNumberCode: subItem.serviceNumberCode || mainItem.serviceNumberCode,
-          description: subItem.description || mainItem.description,
-          totalQuantity: subItem.totalQuantity,
-
-          unitOfMeasurementCode: subItem.unitOfMeasurementCode || mainItem.unitOfMeasurementCode,
-          amountPerUnit: subItem.amountPerUnit,
-          currencyCode: subItem.currencyCode || mainItem.currencyCode,
-          total: subItem.total,
-          // actualQuantity: mainItem.actualQuantity,
-          // actualPercentage: mainItem.actualPercentage,
-
-          // overFulfillmentPercentage: mainItem.overFulfillmentPercentage,
-          // unlimitedOverFulfillment: mainItem.unlimitedOverFulfillment,
-          // manualPriceEntryAllowed: mainItem.manualPriceEntryAllowed,
-          materialGroupCode: subItem.materialGroupCode || mainItem.materialGroupCode,
-          serviceTypeCode: subItem.serviceTypeCode || mainItem.serviceTypeCode,
-          externalServiceNumber: subItem.externalServiceNumber || mainItem.externalServiceNumber,
-          serviceText: subItem.serviceText || mainItem.serviceText,
-          lineText: subItem.lineText || mainItem.lineText,
-          personnelNumberCode: subItem.personnelNumberCode || mainItem.personnelNumberCode,
-          lineTypeCode: subItem.lineTypeCode || mainItem.lineTypeCode,
-
-          lineNumber: subItem.lineNumber || mainItem.lineNumber,
-          biddersLine: subItem.biddersLine || mainItem.biddersLine,
-          supplementaryLine: subItem.supplementaryLine || mainItem.supplementaryLine,
-          lotCostOne: subItem.lotCostOne || mainItem.lotCostOne,
-          doNotPrint: mainItem.doNotPrint,
-          executionOrderMainCode: mainItem.executionOrderMainCode
-        });
-      });
     });
 
     return transformed;
