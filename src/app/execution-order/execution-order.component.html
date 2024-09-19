@@ -81,7 +81,7 @@
             <th style="min-width: 10rem;">Currency</th>
             <th style="min-width: 10rem;">Total</th>
             <th style="min-width: 10rem;">Actual Quantity</th>
-            <th style="min-width: 10rem;">Actual Percentage</th>
+            <th style="min-width: 10rem;">Actual Percentage %</th>
             <th style="min-width: 10rem;">OverFulfillment %</th>
             <th style="min-width: 10rem;">UnlimitedOverFulfillment</th>
             <th style="min-width: 10rem;">ManualPriceEntryAllowed</th>
@@ -259,8 +259,8 @@
                 <!-- Actual Quantity -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <!-- <input pInputNumber name="actualQuantity" type="number" [min]="0"
-                            [(ngModel)]="mainItem.actualQuantity"> -->
+                        <input pInputNumber class="rounded-input" name="actualQuantity" disabled type="number" [min]="0"
+                            [(ngModel)]="mainItem.actualQuantity">
 
                     </ng-template>
                     <ng-template pTemplate="output">
@@ -272,12 +272,13 @@
                 <!-- Actual Percentage -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <!-- <input pInputNumber name="actualPercentage" type="number" [min]="0"
-                            [(ngModel)]="mainItem.actualPercentage"> -->
+                        <input pInputNumber class="rounded-input" name="actualPercentage" disabled type="number" [min]="0"
+                            [(ngModel)]="mainItem.actualPercentage">
 
                     </ng-template>
                     <ng-template pTemplate="output">
-                        {{ mainItem.actualPercentage }}
+
+                        {{ mainItem.actualPercentage? mainItem.actualPercentage+"%": ""  }}
                     </ng-template>
                 </p-cellEditor>
             </td>
