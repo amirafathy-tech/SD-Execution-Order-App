@@ -41,7 +41,6 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
 import { AlertComponent } from './shared/alert/alert.component';
 import { ExecutionOrderComponent } from './execution-order/execution-order.component';
 import { SearchPipe } from './pipes/search.pipe';
-import { ServiceInvoiceComponent } from './service-invoice/service-invoice.component';
 import { TruncateWordsPipe } from './pipes/truncate-words.pipe';
 
 @NgModule({
@@ -51,7 +50,6 @@ import { TruncateWordsPipe } from './pipes/truncate-words.pipe';
     LoadingSpinnerComponent,
     ExecutionOrderComponent,
     SearchPipe,
-    ServiceInvoiceComponent,
     TruncateWordsPipe,
 
   ],

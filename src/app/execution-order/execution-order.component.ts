@@ -17,8 +17,6 @@ import { NavigationExtras, Router } from '@angular/router';
 @Component({
   selector: 'app-execution-order',
   templateUrl: './execution-order.component.html',
-  //'./new.component.html',
-  //./execution-order.component.html
   styleUrls: ['./execution-order.component.scss'],
   providers: [MessageService, ExecutionOrderService, ConfirmationService]
 })
@@ -210,14 +208,11 @@ export class ExecutionOrderComponent {
   }
   onMainItemEditSave(index: number, record: MainItem) {
     console.log(record);
-   // const { executionOrderMainCode,total, ...mainItemWithoutMainItemCode } = record;
-   // const updatedMainItem = this.removePropertiesFrom(mainItemWithoutMainItemCode, ['executionOrderMainCode']);
     const updatedMainItem = this.removePropertiesFrom(record, ['executionOrderMainCode','total']);
     console.log(updatedMainItem);
     console.log(this.updateSelectedServiceNumber);
 
     if (this.updateSelectedServiceNumberRecord) {
-     
       const newRecord: MainItem = {
       // ...record, // Copy all properties from the original record
       ...updatedMainItem,
@@ -227,8 +222,6 @@ export class ExecutionOrderComponent {
         serviceTypeCode: this.updateSelectedServiceNumberRecord.serviceTypeCode,
       };
       console.log(newRecord);
-     // const { executionOrderMainCode,total, ...updatedNewRecord } = newRecord;
-      // const updatedNewRecord = this.removePropertiesFrom(newRecord, ['executionOrderMainCode']);
       console.log(newRecord);
          // Remove properties with empty or default values
          const filteredRecord = Object.fromEntries(
@@ -257,9 +250,7 @@ export class ExecutionOrderComponent {
     }
 
     if (!this.updateSelectedServiceNumberRecord) {
-      //console.log({ ...mainItemWithoutMainItemCode });
       console.log(updatedMainItem);
-      
        // Remove properties with empty or default values
        const filteredRecord = Object.fromEntries(
         Object.entries(updatedMainItem).filter(([_, value]) => {
@@ -278,7 +269,6 @@ export class ExecutionOrderComponent {
         },
         complete: () => {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
-          // this.ngOnInit()
         }
       });
     }
@@ -312,22 +302,6 @@ export class ExecutionOrderComponent {
         }
       });
     }
-  }
-
-  // redirect to service-invoice:
-  navigateServiceInvoice() {
-
-    if (this.selectedMainItem) {
-      const navigationExtras: NavigationExtras = {
-        state: {
-          Record: this.selectedMainItem
-        }
-      };
-      console.log(navigationExtras);
-
-      this.router.navigate(['/service-invoice'], navigationExtras);
-    }
-
   }
 
   // For Add new  Main Item
@@ -607,7 +581,6 @@ export class ExecutionOrderComponent {
 
     return transformed;
   }
-
   exportExcel() {
     import('xlsx').then((xlsx) => {
       const transformedData = this.transformData(this.mainItemsRecords);
@@ -641,7 +614,6 @@ export class ExecutionOrderComponent {
       this.saveAsExcelFile(excelBuffer, 'Execution Order');
     });
   }
-
   saveAsExcelFile(buffer: any, fileName: string): void {
     let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     let EXCEL_EXTENSION = '.xlsx';

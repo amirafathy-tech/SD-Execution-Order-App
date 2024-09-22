@@ -15,31 +15,29 @@
 
 
 .scrollable-tooltip {
-  max-width: 300px; /* Adjust as needed */
-  max-height: 150px; /* Adjust as needed */
-  overflow-y: auto; /* Enable vertical scrolling */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  white-space: pre-wrap; /* Preserve whitespace formatting */
+  max-width: 300px; 
+  max-height: 150px; 
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  white-space: pre-wrap; 
 }
 
 
 .text-container {
   display: flex;
-  align-items: center;      /* Center text vertically */
-  overflow: hidden;         /* Ensure container doesn’t overflow */
+  align-items: center;  
+  overflow: hidden;   
 }
 
 /* Ensure text truncation */
 .text-ellipsis {
-  white-space: nowrap;      /* Prevents text from wrapping */
-  overflow: hidden;         /* Hides overflowing text */
-  text-overflow: ellipsis;  /* Adds ellipsis when text is cut off */
-  flex: 1;                  /* Ensures it fills available space */
+  white-space: nowrap;     
+  overflow: hidden;       
+  text-overflow: ellipsis;  
+  flex: 1;               
 }
 
-.custom-table-bg {
-    background-color: #da3636 !important; /* Replace with your desired color */
-  }
+
   
 .p-datatable-head{
   background-color: blueviolet;
@@ -54,19 +52,3 @@
   //   // border-radius: 5rem;
   // }
 }
-
-// .ng-star-inserted{
-//   background-color: #ba411f;
-// }
-  // td{
-  //   border: 0.25px solid #999;
-  // }
-
-
-  // :host ::ng-deep {
-  //   #myTable {
-  //     .p-datatable-header {
-  //       background-color: rgb(130, 13, 13);
-  //     }
-  //   }
-  // }

@@ -13,8 +13,6 @@
             <button pButton icon="pi pi-print" size="small" class="m-2 "></button>
             <button pButton label="Export" size="small" (click)="exportExcel()" icon="pi pi-download"
                 class="m-2"></button>
-            <!-- <button pButton label="Service-Invoice" size="small" (click)="navigateServiceInvoice()" icon="pi pi-upload"
-                class="m-2"></button> -->
         </div>
     </p-toolbar>
 
@@ -36,38 +34,24 @@
 <p-toast></p-toast>
 
 <p-table [value]="mainItemsRecords |search:searchKey" dataKey="executionOrderMainCode" [resizableColumns]="true"
-     editMode="row" selectionMode="multiple" [(selection)]="selectedExecutionOrder"
-     [rowHover]="true"
-     [rows]="10"
-     [showCurrentPageReport]="true"
-     [rowsPerPageOptions]="[10, 25, 50]"
-     [loading]="loading"
-     [paginator]="true"
-     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-     [filterDelay]="0">
+    editMode="row" selectionMode="multiple" [(selection)]="selectedExecutionOrder" [rowHover]="true" [rows]="10"
+    [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [loading]="loading" [paginator]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [filterDelay]="0">
 
     <ng-template pTemplate="caption">
         <div class="flex flex-wrap justify-content-between gap-2">
             <div class="border border-primary rounded">
                 <div fd-form-item>
-
                     <fd-input-group type="search" glyph="search" glyphAriaLabel="Search" placeholder="Search..."
                         [button]="true" [disabled]="false" [(ngModel)]="searchKey">
                     </fd-input-group>
                 </div>
             </div>
-            <!-- <div>
-                <span class="p-input-icon-left">
-                    <input pInputText type="text" placeholder="Search...." [(ngModel)]="searchKey"
-                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-primary focus:border-primary w-100 " />
-                </span>
-            </div> -->
         </div>
     </ng-template>
 
     <ng-template pTemplate="header">
         <tr>
-            <!-- <th style="min-width: 10rem;"> </th> -->
             <th style="min-width: 10rem;">
                 <!-- <p-checkbox (onChange)="onSelectAllRecords($event)" [value]="invoicesRecords"></p-checkbox> -->
             </th>
@@ -100,26 +84,22 @@
         </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-mainItem let-editing="editing" let-ri="rowIndex" >
+    <ng-template pTemplate="body" let-mainItem let-editing="editing" let-ri="rowIndex">
         <tr [pEditableRow]="mainItem">
 
             <td style="min-width: 10rem;">
                 <p-tableCheckbox [value]="mainItem" />
                 <!-- <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.selected"
                     (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox> -->
-
             </td>
             <td style="min-width: 10rem;">
-                <p-checkbox [value]="mainItem"  [(ngModel)]="mainItem.doNotPrint"
+                <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.doNotPrint"
                     (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox>
 
             </td>
             <td style="min-width: 10rem;">
                 {{ rowIndex + ri + 1 }}
             </td>
-            <!-- <td style="min-width: 10rem;">
-
-            </td> -->
             <td style="min-width: 10rem;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
@@ -140,34 +120,31 @@
                         {{mainItem.serviceNumberCode}}
                     </ng-template>
                 </p-cellEditor>
-                <!-- {{ mainItem.serviceNumber }} -->
             </td>
             <td style="min-width: 10rem;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <ng-container *ngIf="!updateSelectedServiceNumberRecord">
                             <input pInputText type="text" [(ngModel)]="mainItem.description" class="rounded-input"
-                            pTooltip="{{ mainItem.description }}" tooltipPosition="top"  [autoHide]="false">
+                                pTooltip="{{ mainItem.description }}" tooltipPosition="top" [autoHide]="false">
                         </ng-container>
                         <ng-container *ngIf="updateShortTextChangeAllowed && updateSelectedServiceNumberRecord">
                             <input pInputText type="text" [ngModel]="updateSelectedServiceNumberRecord.description"
-                            class="rounded-input" (ngModelChange)="updateShortText = $event"
-                                pTooltip="{{ mainItem.description }}" tooltipPosition="top"  [autoHide]="false">
+                                class="rounded-input" (ngModelChange)="updateShortText = $event"
+                                pTooltip="{{ mainItem.description }}" tooltipPosition="top" [autoHide]="false">
                         </ng-container>
                         <ng-container *ngIf="!updateShortTextChangeAllowed && updateSelectedServiceNumberRecord">
                             <!-- {{ updateSelectedServiceNumberRecord.description }} -->
-                            <div class="text-ellipsis"
-                            [pTooltip]="updateSelectedServiceNumberRecord.description"
-                            tooltipPosition="top" [autoHide]="false">
-                            {{ updateSelectedServiceNumberRecord.description | truncateWords }}
-                        </div>
+                            <div class="text-ellipsis" [pTooltip]="updateSelectedServiceNumberRecord.description"
+                                tooltipPosition="top" [autoHide]="false">
+                                {{ updateSelectedServiceNumberRecord.description | truncateWords }}
+                            </div>
                         </ng-container>
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <!-- {{ mainItem.description }} -->
                         <div class="text-container">
-                            <div class="text-ellipsis" pTooltip="{{ mainItem.description }}"
-                                tooltipPosition="top" [autoHide]="false">
+                            <div class="text-ellipsis" pTooltip="{{ mainItem.description }}" tooltipPosition="top"
+                                [autoHide]="false">
                                 {{ mainItem.description | truncateWords}}
                             </div>
                         </div>
@@ -175,11 +152,10 @@
                 </p-cellEditor>
             </td>
             <td style="min-width: 10rem;">
-
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber [min]="0" class="rounded-input" type="number" [(ngModel)]="mainItem.totalQuantity">
-                        
+                        <input pInputNumber [min]="0" class="rounded-input" type="number"
+                            [(ngModel)]="mainItem.totalQuantity">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.totalQuantity }}
@@ -272,13 +248,11 @@
                 <!-- Actual Percentage -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber class="rounded-input" name="actualPercentage" disabled type="number" [min]="0"
-                            [(ngModel)]="mainItem.actualPercentage">
-
+                        <input pInputNumber class="rounded-input" name="actualPercentage" disabled type="number"
+                            [min]="0" [(ngModel)]="mainItem.actualPercentage">
                     </ng-template>
                     <ng-template pTemplate="output">
-
-                        {{ mainItem.actualPercentage? mainItem.actualPercentage+"%": ""  }}
+                        {{ mainItem.actualPercentage? mainItem.actualPercentage+"%": "" }}
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -286,9 +260,8 @@
                 <!-- OverFulfillment -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber class="rounded-input" name="overFulfillmentPercentage" type="number" [min]="0"
-                            [(ngModel)]="mainItem.overFulfillmentPercentage">
-
+                        <input pInputNumber class="rounded-input" name="overFulfillmentPercentage" type="number"
+                            [min]="0" [(ngModel)]="mainItem.overFulfillmentPercentage">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.overFulfillmentPercentage }}
@@ -301,7 +274,6 @@
                     <ng-template pTemplate="input">
                         <input pInputNumber class="rounded-input" name="unlimitedOverFulfillment" type="checkbox"
                             [(ngModel)]="mainItem.unlimitedOverFulfillment">
-
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.unlimitedOverFulfillment }}
@@ -314,19 +286,15 @@
                     <ng-template pTemplate="input">
                         <input pInputText class="rounded-input" name="manualPriceEntryAllowed" type="checkbox"
                             [(ngModel)]="mainItem.manualPriceEntryAllowed">
-
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.manualPriceEntryAllowed }}
                     </ng-template>
                 </p-cellEditor>
-
-
             </td>
 
             <td style="min-width: 10rem;">
                 <!-- Material Grp -->
-
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <ng-container *ngIf="updateSelectedServiceNumberRecord">
@@ -346,12 +314,10 @@
                             </p-dropdown>
                         </ng-container>
                     </ng-template>
-
                     <ng-template pTemplate="output">
                         {{mainItem.materialGroupCode }}
                     </ng-template>
                 </p-cellEditor>
-
             </td>
 
             <td style="min-width: 10rem;">
@@ -379,8 +345,6 @@
                         {{mainItem.serviceTypeCode }}
                     </ng-template>
                 </p-cellEditor>
-
-
             </td>
 
             <td style="min-width: 10rem;">
@@ -388,12 +352,10 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText class="rounded-input" name="externalServiceNumber" type="text"
-                            [(ngModel)]="mainItem.externalServiceNumber"
-                            pTooltip="{{ mainItem.externalServiceNumber }}" tooltipPosition="top"  [autoHide]="false">
-
+                            [(ngModel)]="mainItem.externalServiceNumber" pTooltip="{{ mainItem.externalServiceNumber }}"
+                            tooltipPosition="top" [autoHide]="false">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <!-- {{ mainItem.externalServiceNumber }} -->
                         <div class="text-container">
                             <div class="text-ellipsis" pTooltip="{{ mainItem.externalServiceNumber }}"
                                 tooltipPosition="top" [autoHide]="false">
@@ -403,21 +365,19 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
-           
 
             <td style="min-width: 10rem;">
                 <!-- Service Text -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText class="rounded-input" name="serviceText" type="text" [(ngModel)]="mainItem.serviceText"
-                        pTooltip="{{ mainItem.serviceText }}" tooltipPosition="top"  [autoHide]="false">
-
+                        <input pInputText class="rounded-input" name="serviceText" type="text"
+                            [(ngModel)]="mainItem.serviceText" pTooltip="{{ mainItem.serviceText }}"
+                            tooltipPosition="top" [autoHide]="false">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <!-- {{ mainItem.serviceText }} -->
                         <div class="text-container">
-                            <div class="text-ellipsis" pTooltip="{{ mainItem.serviceText }}"
-                                tooltipPosition="top" [autoHide]="false">
+                            <div class="text-ellipsis" pTooltip="{{ mainItem.serviceText }}" tooltipPosition="top"
+                                [autoHide]="false">
                                 {{ mainItem.serviceText | truncateWords}}
                             </div>
                         </div>
@@ -429,15 +389,14 @@
                 <!--  Line Text -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputText class="rounded-input" name="lineText" type="text" [(ngModel)]="mainItem.lineText"
-                        pTooltip="{{ mainItem.lineText }}" tooltipPosition="top"  [autoHide]="false">
-
+                        <input pInputText class="rounded-input" name="lineText" type="text"
+                            [(ngModel)]="mainItem.lineText" pTooltip="{{ mainItem.lineText }}" tooltipPosition="top"
+                            [autoHide]="false">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <!-- {{ mainItem.lineText }} -->
                         <div class="text-container">
-                            <div class="text-ellipsis" pTooltip="{{ mainItem.lineText }}"
-                                tooltipPosition="top" [autoHide]="false">
+                            <div class="text-ellipsis" pTooltip="{{ mainItem.lineText }}" tooltipPosition="top"
+                                [autoHide]="false">
                                 {{ mainItem.lineText | truncateWords}}
                             </div>
                         </div>
@@ -445,25 +404,21 @@
                 </p-cellEditor>
             </td>
 
-
             <td style="min-width: 10rem;">
                 <!-- Personnel Number -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText class="rounded-input" name="personnelNumberCode" type="text"
-                            [(ngModel)]="mainItem.personnelNumberCode"
-                            pTooltip="{{ mainItem.personnelNumberCode }}" tooltipPosition="top"  [autoHide]="false">
-
+                            [(ngModel)]="mainItem.personnelNumberCode" pTooltip="{{ mainItem.personnelNumberCode }}"
+                            tooltipPosition="top" [autoHide]="false">
                     </ng-template>
                     <ng-template pTemplate="output">
-                        <!-- {{ mainItem.personnelNumberCode }} -->
                         <div class="text-container">
                             <div class="text-ellipsis" pTooltip="{{ mainItem.personnelNumberCode }}"
                                 tooltipPosition="top" [autoHide]="false">
                                 {{ mainItem.personnelNumberCode | truncateWords}}
                             </div>
                         </div>
-                          
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -482,7 +437,6 @@
                                 </div>
                             </ng-template>
                         </p-dropdown>
-
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.lineTypeCode }}
@@ -494,8 +448,8 @@
                 <!-- Line Number -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input pInputNumber class="rounded-input" name="lineNumber" type="text" [(ngModel)]="mainItem.lineNumber">
-
+                        <input pInputNumber class="rounded-input" name="lineNumber" type="text"
+                            [(ngModel)]="mainItem.lineNumber">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.lineNumber }}
@@ -507,8 +461,8 @@
                 <!-- Bidders Line -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input  name="biddersLine" class="rounded-input" [(ngModel)]="mainItem.biddersLine" type="checkbox">
-
+                        <input name="biddersLine" class="rounded-input" [(ngModel)]="mainItem.biddersLine"
+                            type="checkbox">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.biddersLine }}
@@ -519,9 +473,8 @@
                 <!--  Supplementary Line  -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input  name="supplementaryLine"  class="rounded-input" [(ngModel)]="mainItem.supplementaryLine"
+                        <input name="supplementaryLine" class="rounded-input" [(ngModel)]="mainItem.supplementaryLine"
                             type="checkbox">
-
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.supplementaryLine }}
@@ -532,8 +485,8 @@
                 <!-- Lot Cost One -->
                 <p-cellEditor>
                     <ng-template pTemplate="input">
-                        <input  name="lotCostOne" class="rounded-input" [(ngModel)]="mainItem.lotCostOne" type="checkbox">
-
+                        <input name="lotCostOne" class="rounded-input" [(ngModel)]="mainItem.lotCostOne"
+                            type="checkbox">
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.lotCostOne }}
@@ -542,7 +495,6 @@
             </td>
 
             <td style="min-width: 10rem;">
-
                 <div class="flex align-items-center justify-content-center gap-2">
                     <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
                         (click)="onMainItemEditInit(mainItem)" class="p-button-rounded p-button-text"></button>
@@ -559,20 +511,12 @@
 
     <ng-template pTemplate="footer" class="m-3">
         <tr>
-            <!-- <td style="min-width: 10rem;">
-
-            </td> -->
             <td style="min-width: 10rem;">
-
             </td>
             <td style="min-width: 10rem;">
-
             </td>
             <td style="min-width: 10rem;">
-
             </td>
-            <!-- <td style="min-width: 10rem;">
-            </td> -->
             <td style="min-width: 10rem;">
                 <p-dropdown [options]="recordsServiceNumber" [(ngModel)]="selectedServiceNumber"
                     [ngModelOptions]="{standalone: true}" optionValue="serviceNumberCode" optionLabel="description"
@@ -589,31 +533,31 @@
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="!selectedServiceNumberRecord">
                     <input pInputText name="description" type="text" [(ngModel)]="newMainItem.description"
-                    pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false" class="rounded-input">
+                        pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false"
+                        class="rounded-input">
                 </ng-container>
                 <ng-container *ngIf="shortTextChangeAllowed && selectedServiceNumberRecord">
-                    <input pInputText type="text" [(ngModel)]="selectedServiceNumberRecord.description" class="rounded-input"
-                        (ngModelChange)="shortText = $event" pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false">
+                    <input pInputText type="text" [(ngModel)]="selectedServiceNumberRecord.description"
+                        class="rounded-input" (ngModelChange)="shortText = $event"
+                        pTooltip="{{ newMainItem.description }}" tooltipPosition="top" [autoHide]="false">
                 </ng-container>
                 <ng-container *ngIf="!shortTextChangeAllowed && selectedServiceNumberRecord">
-                    <div class="text-ellipsis"
-                    [pTooltip]="selectedServiceNumberRecord.description"
-                    tooltipPosition="top" [autoHide]="false">
-                    {{ selectedServiceNumberRecord.description | truncateWords }}
-                </div>
+                    <div class="text-ellipsis" [pTooltip]="selectedServiceNumberRecord.description"
+                        tooltipPosition="top" [autoHide]="false">
+                        {{ selectedServiceNumberRecord.description | truncateWords }}
+                    </div>
                 </ng-container>
             </td>
 
             <td style="min-width: 10rem;">
-                <input pInputNumber name="totalQuantity" type="number" [min]="0"
-                    [(ngModel)]="newMainItem.totalQuantity" class="rounded-input">
+                <input pInputNumber name="totalQuantity" type="number" [min]="0" [(ngModel)]="newMainItem.totalQuantity"
+                    class="rounded-input">
             </td>
 
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="selectedServiceNumberRecord">
                     {{selectedServiceNumberRecord.baseUnitOfMeasurement}}
                 </ng-container>
-
                 <ng-container *ngIf="!selectedServiceNumberRecord">
                     <p-dropdown [options]="recordsUnitOfMeasure" [(ngModel)]="selectedUnitOfMeasure"
                         [ngModelOptions]="{standalone: true}" optionValue="UnitOfMeasureLongName"
@@ -630,8 +574,8 @@
                 </ng-container>
             </td>
             <td style="min-width: 10rem;">
-                <input pInputNumber name="amountPerUnit" type="number" [min]="0"
-                    [(ngModel)]="newMainItem.amountPerUnit" class="rounded-input">
+                <input pInputNumber name="amountPerUnit" type="number" [min]="0" [(ngModel)]="newMainItem.amountPerUnit"
+                    class="rounded-input">
             </td>
             <td style="min-width: 10rem;">
                 <p-dropdown [options]="recordsCurrency" [(ngModel)]="selectedCurrency"
@@ -649,7 +593,6 @@
             <td style="min-width: 10rem;">
                 {{ (newMainItem.totalQuantity ?? 0) * (newMainItem.amountPerUnit ?? 0) }}
                 <!-- <input pInputNumber name="total" type="number" [min]="0" [(ngModel)]="newMainItem.total"> -->
-
             </td>
             <!-- Actual Quantity -->
             <td style="min-width: 10rem;">
@@ -678,7 +621,6 @@
             </td>
             <!-- Material Grp -->
             <td style="min-width: 10rem;">
-
                 <ng-container *ngIf="selectedServiceNumberRecord">
                     {{ selectedServiceNumberRecord.materialGroupCode }}
                 </ng-container>
@@ -694,7 +636,6 @@
                         </ng-template>
                     </p-dropdown>
                 </ng-container>
-
             </td>
             <!-- Service Type  -->
             <td style="min-width: 10rem;">
@@ -702,7 +643,6 @@
                     {{ selectedServiceNumberRecord.serviceTypeCode }}
                 </ng-container>
                 <ng-container *ngIf="!selectedServiceNumberRecord">
-
                     <p-dropdown [options]="recordsServiceType" [(ngModel)]="selectedServiceType"
                         [ngModelOptions]="{standalone: true}" optionValue="serviceId" optionLabel="serviceId"
                         [filter]="true" [filterFields]="['serviceId','description']" [showClear]="true"
@@ -715,7 +655,6 @@
                         </ng-template>
                     </p-dropdown>
                 </ng-container>
-
             </td>
             <!-- External Service Number -->
             <td style="min-width: 10rem;">
@@ -725,19 +664,21 @@
             </td>
             <!-- Service Text -->
             <td style="min-width: 10rem;">
-                <input pInputNumber name="serviceText" class="rounded-input" type="text" [(ngModel)]="newMainItem.serviceText"
-                pTooltip="{{ newMainItem.serviceText }}" tooltipPosition="top" [autoHide]="false">
+                <input pInputNumber name="serviceText" class="rounded-input" type="text"
+                    [(ngModel)]="newMainItem.serviceText" pTooltip="{{ newMainItem.serviceText }}" tooltipPosition="top"
+                    [autoHide]="false">
 
             </td>
             <!--  Line Text -->
             <td style="min-width: 10rem;">
                 <input pInputText name="lineText" class="rounded-input" type="text" [(ngModel)]="newMainItem.lineText"
-                pTooltip="{{ newMainItem.lineText }}" tooltipPosition="top" [autoHide]="false">
+                    pTooltip="{{ newMainItem.lineText }}" tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Personnel Number -->
             <td style="min-width: 10rem;">
-                <input pInputText name="personnelNumberCode" class="rounded-input" type="text" [(ngModel)]="newMainItem.personnelNumberCode"
-                pTooltip="{{ newMainItem.personnelNumberCode }}" tooltipPosition="top" [autoHide]="false">
+                <input pInputText name="personnelNumberCode" class="rounded-input" type="text"
+                    [(ngModel)]="newMainItem.personnelNumberCode" pTooltip="{{ newMainItem.personnelNumberCode }}"
+                    tooltipPosition="top" [autoHide]="false">
             </td>
             <!-- Line Type -->
             <td style="min-width: 10rem;">
@@ -751,26 +692,29 @@
                         </div>
                     </ng-template>
                 </p-dropdown>
-
             </td>
             <!-- Line Number -->
             <td style="min-width: 10rem;">
-                <input pInputNumber name="lineNumber" class="rounded-input" type="text" [(ngModel)]="newMainItem.lineNumber"
-                pTooltip="{{ newMainItem.lineNumber }}" tooltipPosition="top" [autoHide]="false">
+                <input pInputNumber name="lineNumber" class="rounded-input" type="text"
+                    [(ngModel)]="newMainItem.lineNumber" pTooltip="{{ newMainItem.lineNumber }}" tooltipPosition="top"
+                    [autoHide]="false">
             </td>
             <!-- Bidders Line -->
             <td style="min-width: 10rem;">
-                <input pInputText name="biddersLine" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.biddersLine">
+                <input pInputText name="biddersLine" class="rounded-input" type="checkbox"
+                    [(ngModel)]="newMainItem.biddersLine">
             </td>
 
             <!--  Supplementary Line  -->
             <td style="min-width: 10rem;">
-                <input pInputText name="supplementaryLine" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.supplementaryLine">
+                <input pInputText name="supplementaryLine" class="rounded-input" type="checkbox"
+                    [(ngModel)]="newMainItem.supplementaryLine">
             </td>
 
             <!-- Lot Cost One -->
             <td style="min-width: 10rem;">
-                <input pInputText name="lotCostOne" class="rounded-input" type="checkbox" [(ngModel)]="newMainItem.lotCostOne">
+                <input pInputText name="lotCostOne" class="rounded-input" type="checkbox"
+                    [(ngModel)]="newMainItem.lotCostOne">
             </td>
 
             <td style="min-width: 10rem;">
